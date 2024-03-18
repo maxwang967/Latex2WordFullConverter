@@ -1,0 +1,6 @@
+latex2mathml @ file:///home/conda/feedstock_root/build_artifacts/latex2mathml_1702028925491/work
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.2
+PyQt6-sip==13.6.0
+setuptools==69.2.0
+wheel==0.42.0
