@@ -1,7 +1,18 @@
 import sys
+import os
+
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLineEdit, QTextEdit, QMessageBox, QStatusBar
 from PyQt6.QtGui import QClipboard
 from latex2mathml.converter import convert
+
+if getattr(sys, 'frozen', False):
+    # 如果应用被打包
+    application_path = sys._MEIPASS
+else:
+    # 在开发环境中
+    application_path = os.path.dirname(__file__)
+
+unimathsymbols_path = os.path.join(application_path, 'latex2mathml', 'unimathsymbols.txt')
 
 class Latex2MathMLConverter(QMainWindow):
     def __init__(self):
@@ -51,7 +62,7 @@ class Latex2MathMLConverter(QMainWindow):
             self.statusBar().showMessage('Conversion Completed!')  # 转换完成更新状态栏
         except Exception as e:
             # 异常处理，显示错误信息
-            QMessageBox.critical(self, "Conversion Error", "Please input the legal latex codes.")
+            QMessageBox.critical(self, "Conversion Error", f"Please input the legal latex codes. Detailed error: {str(e)}")
             self.mathmlOutput.setPlainText("")
             self.statusBar().showMessage('Conversion Failed!')  # 更新状态栏为失败状态
     
