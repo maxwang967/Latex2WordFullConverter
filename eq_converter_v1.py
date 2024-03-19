@@ -1,9 +1,10 @@
 import sys
 import os
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMessageBox, QGroupBox, QHBoxLayout, QRadioButton, QTextBrowser
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMessageBox, QGroupBox, QHBoxLayout, QRadioButton, QTextBrowser, QLabel
 from PyQt6.QtGui import QClipboard
 from latex2mathml.converter import convert
+from latex2mathml.exceptions import MissingEndError
 import re
 
 if getattr(sys, 'frozen', False):
@@ -20,15 +21,45 @@ class Latex2MathMLConverter(QMainWindow):
         super().__init__()
         self.initUI()
         self.part_texts = []  # 用于保存每个部分的实际文本内容
+        self.explanationVisible = True  # 追踪说明文本的显示状态
     
     def initUI(self):
-        self.setWindowTitle('LaTeX to MathML Converter by maxwang967@gmail.com')
+        self.setWindowTitle('Latex2Word Full Converter')
         self.statusBar().showMessage('Ready.') 
         self.setFixedSize(1024, 768)
         # 设置中心窗口和布局
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
         layout = QVBoxLayout(centralWidget)
+
+        # 创建一个 QGroupBox 用于包含说明文本
+        self.explanationGroupBox = QGroupBox("")
+        explanationLayout = QVBoxLayout()
+
+        explanationLabel = QLabel("<b>Welcome to Latex2Word Full Converter!</b><br>"
+                                  "<p>Enter your LaTeX code below and see the converted output.</p>"
+                                  "<ul>"
+                                  "<li>In the 'Equation Only' mode, just input the equation in latex with/without '$','$$' or '\\begin{equation}', etc.</li>"
+                                  "<li>In the 'Text Equation Mix' mode, just input the mixed latex codes, and the converted results will show in two colors (i.e., black for normal text, and blue for equations).</li>"
+                                  "<li>You can click on the 'black' part or 'blue' part to put them in your clipboard, and just paste in Microsoft Word with 'Unformatted Text' mode to display just as you see in the latex codes.</li>"
+                                  "<li>Note that Microsoft Word does not support to copy mixed text (i.e., normal text and equation) together, and thus you need to click on each part of the results and copy them in sequence.</li>"
+                                  "<li>Please feel free to create issues in <a href='https://github.com/maxwang967/Latex2WordFullConverter'>link<a/>.</li>"
+                                  "</ul>")
+        explanationLabel.setWordWrap(True)
+        explanationLabel.setOpenExternalLinks(True)
+        # explanationLabel.setHidden(True)
+        # 将说明文本添加到 QGroupBox 的布局中
+        explanationLayout.addWidget(explanationLabel)
+        self.explanationGroupBox.setLayout(explanationLayout)
+
+        # 将 QGroupBox 添加到主布局中
+        layout.addWidget(self.explanationGroupBox)
+
+        # 添加一个箭头按钮用于显示或隐藏说明文本
+        self.toggleButton = QPushButton()
+        self.toggleButton.setText("Hide") 
+        self.toggleButton.clicked.connect(self.toggleExplanation)
+        layout.addWidget(self.toggleButton)
 
         # LaTeX输入组件
         self.latexInput = QTextEdit()
@@ -43,7 +74,7 @@ class Latex2MathMLConverter(QMainWindow):
         self.mathmlOutput.setReadOnly(True)  # 禁止编辑但允许选中和复制
         layout.addWidget(self.mathmlOutput)
 
-                # 创建选项组
+        # 创建选项组
         self.optionGroup = QGroupBox("Conversion Options")
         optionLayout = QHBoxLayout()
 
@@ -65,9 +96,14 @@ class Latex2MathMLConverter(QMainWindow):
 
 
         # 复制到剪贴板按钮
-        self.copyButton = QPushButton('Copy to Clipboard')
+        self.copyButton = QPushButton('Copy All')
         self.copyButton.clicked.connect(self.copyToClipboard)
         layout.addWidget(self.copyButton)
+
+        # add clear button
+        self.clearButton = QPushButton('Clear')
+        self.clearButton.clicked.connect(self.clearAll)
+        layout.addWidget(self.clearButton)
     
 
     def convertLatexToMathML(self, latex_str):
@@ -100,10 +136,11 @@ class Latex2MathMLConverter(QMainWindow):
                 # self.mathmlOutput.setPlainText(result_text)
             
             self.statusBar().showMessage('Conversion Completed!')  # 转换完成更新状态栏
-        except Exception as e:
-            # 异常处理，显示错误信息
-            QMessageBox.critical(self, "Conversion Error", f"Please input the legal latex codes. Detailed error: {str(e)}")
-            self.mathmlOutput.setPlainText("")
+        except MissingEndError:
+            QMessageBox.critical(self, "Conversion Error", f"Missing end tag for the equations, at: {clean_part.replace("\\\\", "").replace("&", "")}")
+            self.statusBar().showMessage('Conversion Failed!')  # 更新状态栏为失败状态
+        except Exception:
+            QMessageBox.critical(self, "Conversion Error", f"Fatal error, at: {clean_part.replace("\\\\", "").replace("&", "")}")
             self.statusBar().showMessage('Conversion Failed!')  # 更新状态栏为失败状态
 
     
@@ -141,6 +178,22 @@ class Latex2MathMLConverter(QMainWindow):
         pattern = r'(\$(?:\\.|[^\$\\])*\$|\$\$(?:\\.|[^\$\\])*\$\$|\\begin\{equation\*?\}(?:\\.|[^\$\\])*?\\end\{equation\*?\})'
         parts = re.split(pattern, latex_str, flags=re.DOTALL)
         return parts
+
+    def clearAll(self):
+        self.latexInput.clear()
+        self.mathmlOutput.clear()
+        self.statusBar().showMessage('Ready.')
+
+
+    def toggleExplanation(self):
+        # 切换说明文本的可见性
+        self.explanationVisible = not self.explanationVisible
+        self.explanationGroupBox.setVisible(self.explanationVisible)
+        # 根据当前状态更新箭头方向
+        if self.explanationVisible:
+            self.toggleButton.setText("Hide")
+        else:
+            self.toggleButton.setText("Show")
 
 def main():
     app = QApplication(sys.argv)
