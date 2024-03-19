@@ -1,5 +1,7 @@
 # Latex2WordFullConverter
 
+## Attention: The release version is not always up-to-date, please run the source code for latest experience.
+
 ## Brief Intro
 
 The official Microsoft Word does not support specific Latex grammars, which is the obstacle for users to correctly include the latex equations in the Word document file.
