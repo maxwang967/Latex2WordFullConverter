@@ -87,7 +87,7 @@ class Latex2MathMLConverter(QMainWindow):
                     clean_part = part.strip("$")  # 假设我们直接将$...$内的内容当做公式
                       # 保存实际的文本内容
                     # if part.startswith("$") and part.endswith("$"):
-                    if re.match(r'^\$(?:\\.|[^\$\\])*\$$', part) or re.match(r'^\$\$(?:\\.|[^\$\\])*\$\$$', part) or re.match(r'^\\begin\{equation\*?\}(?:\\.|[^\$\\])*?\\end\{equation\*?\}$', part, flags=re.DOTALL):
+                    if (clean_part != "") and (re.match(r'^\$(?:\\.|[^\$\\])*\$$', part) or re.match(r'^\$\$(?:\\.|[^\$\\])*\$\$$', part) or re.match(r'^\\begin\{equation\*?\}(?:\\.|[^\$\\])*?\\end\{equation\*?\}$', part, flags=re.DOTALL)):
                         # 公式部分
                         formatted_text += f"<span><a href='#part_{i}' style='text-decoration:none; color:blue;'>{clean_part}</a></span>"
                         self.part_texts.append(convert(clean_part.replace("\\\\", "").replace("&", "")))
