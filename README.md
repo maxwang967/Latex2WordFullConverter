@@ -1,9 +1,9 @@
-# Latex2MathML
+# Latex2WordFullConverter
 
 ## Brief Intro
 
 The official Microsoft Word does not support specific Latex grammars, which is the obstacle for users to correctly include the latex equations in the Word document file.
-Therefore, I develop a simple converter to convert the latex codes to mathml codes which can directly pasted into the Word document as an editable equation.
+Therefore, I develop a simple converter to convert the latex codes (text & equations & other latex codes) to mathml codes which can directly pasted into the Word document as an editable equation.
 This GUI is built based on PyQT6, which can support multi-platform including MacOS, Linux and Windows.
 
 ## Running with the source code
