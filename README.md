@@ -1,8 +1,10 @@
 # Latex2WordFullConverter
 
-## Attention: The release version is not always up-to-date, please run the source code for latest experience.
+** Attention: The release version is not always up-to-date, please run the source code for latest experience. **
 
 ## Brief Intro
+
+![screenshot](https://github.com/maxwang967/Latex2WordFullConverter/blob/main/screenshot.png)
 
 The official Microsoft Word does not support specific Latex grammars, which is the obstacle for users to correctly include the latex equations in the Word document file.
 Therefore, I develop a simple converter to convert the latex codes (text & equations & other latex codes) to mathml codes which can directly pasted into the Word document as an editable equation.
