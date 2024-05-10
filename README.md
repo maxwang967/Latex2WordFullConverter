@@ -12,7 +12,7 @@ This GUI is built based on PyQT6, which can support multi-platform including Mac
 
 ## Running with the source code
 
-First, you need to have a Python environment and install the requirements:
+First, you need to have a Python environment and install the requirements (Python 3.12.2):
 
 ```bash
 pip install -r requirements.txt
